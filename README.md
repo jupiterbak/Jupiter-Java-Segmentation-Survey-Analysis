@@ -78,6 +78,50 @@ adk web
 
 ---
 
+## Testing Locally with Google ADK
+
+### Terminal (CLI) mode
+
+Run the agent interactively in the terminal:
+
+```bash
+adk run agentyx
+```
+
+### Web UI mode
+
+Launch the ADK developer UI in your browser — includes a chat interface, event trace, and state inspector:
+
+```bash
+adk web
+```
+
+Then open [http://localhost:8000](http://localhost:8000) and select **agentyx** from the agent dropdown.
+
+### API server mode
+
+Expose the agent as a local REST endpoint (useful for integration testing):
+
+```bash
+adk api_server agentyx
+```
+
+The server starts at `http://localhost:8000`. You can interact with it via:
+
+```bash
+curl -X POST http://localhost:8000/run \
+  -H "Content-Type: application/json" \
+  -d '{"app_name": "agentyx", "user_id": "test-user", "session_id": "test-session", "new_message": {"role": "user", "parts": [{"text": "What are the top customer segments by income?"}]}}'
+```
+
+### Tips
+
+- Set `AGENTYX_ENABLED=FALSE` and `INSIGHTS_ENABLED=TRUE` in `.env` to test with only the Auto Insights toolset active.
+- Set `GOOGLE_GENAI_USE_VERTEXAI=FALSE` and provide a `GOOGLE_API_KEY` to run without a GCP project (uses Gemini API directly).
+- The ADK web UI shows the full reasoning trace — useful for debugging the PlanReAct planner steps.
+
+---
+
 ## Deployment to GCP Agent Engine
 
 ### Step 1 — Authenticate and configure gcloud
