@@ -179,4 +179,61 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+.DS_Store
+*.log
+*.pstat
+prof/
+generated_code/
+data/
+/test-reports
+docs/apidoc/*.yml
+
+# IDE
+.idea
+*.iml
+.vscode
+.devcontainer
+.env
+.venv/
+venv/
+ENV/
+
+# Distribution / packaging
+env/
+build/
+out/
+dist/
+sdist/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# cache
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage/
+.coverage.*
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+coverage-reports/
+/pacts
+pact_logs/
+
+allure-results/
+
+.secrets/
 .scripts/
+.adk/
+
+*sessions.db

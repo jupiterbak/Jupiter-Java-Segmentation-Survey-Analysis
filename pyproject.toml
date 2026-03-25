@@ -1,0 +1,119 @@
+[project]
+name = "jupiter-java-segmentation-survey-analysis"
+dynamic = ["version"]
+description = "An agent that connects to agentyx-service for tools"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-adk",
+    "google-adk[extensions]",
+    "click",
+    "a2a-sdk",
+    "nest-asyncio",
+    "python-dotenv",
+    "uvicorn",
+    "google-generativeai",
+    "httpx",
+    "litellm"
+]
+
+[dependency-groups]
+dev = [
+    "asyncer",
+    "httpx",
+    "typer",
+    "mypy",
+    "pytest-cov",
+    "ruff",
+    "dunamai",
+    "pre-commit",
+    "isort",
+    "pytest",
+    "pytest-mock",
+    "pytest-asyncio",
+    "polyfactory",
+    "faker",
+    "gevent",
+]
+
+[tool.uv]
+managed = true
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+[[tool.uv.index]]
+name = "alteryx"
+url = "https://artifactory.alteryx.com/artifactory/api/pypi/PyPi/simple"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentyx"]
+
+[tool.ruff]
+line-length = 88
+extend-include = ["*.ipynb"]
+target-version = "py313"
+
+[tool.ruff.lint]
+extend-ignore = []
+select = [
+    # pycodestyle
+    "E",
+    "W",
+    # pyflakes
+    "F",
+    # isort
+    "I001",
+    # flake8
+    "TID"
+]
+ignore = [
+    "E501",
+    "N806",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F401", "I001", "E501"]
+"**/tests/*" = ["D"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Disallow all relative imports.
+ban-relative-imports = "all"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 18
+
+[tool.ruff.lint.isort]
+known-first-party = ["agentyx", "tests"]
+
+[tool.pytest.ini_options]
+pythonpath = "src/"
+addopts = "--doctest-modules"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+[tool.coverage.run]
+source = ["src"]
+relative_files = true
+concurrency = ["gevent"]
+
+[tool.mypy]
+mypy_path = "src"
+explicit_package_bases = true
+files = [
+    "src",
+    "tests",
+    "scripts",
+]
+plugins = ['pydantic.mypy']
+
