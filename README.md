@@ -16,6 +16,7 @@ An AI agent built with [Google ADK](https://google.github.io/adk-docs/) that int
 ## Prerequisites
 
 - Python 3.11+
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
 - [Google Cloud SDK (`gcloud`)](https://cloud.google.com/sdk/docs/install) installed and up to date
 - [Google ADK CLI (`adk`)](https://google.github.io/adk-docs/) installed
 - A GCP project with billing enabled
@@ -31,13 +32,33 @@ git clone <YOUR_REPO_URL>
 cd <YOUR_REPO_DIR>
 ```
 
-### 2. Install dependencies
+### 2. Install uv
+
+If you don't have `uv` installed:
 
 ```bash
-pip install -r requirements.txt
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-### 3. Configure environment variables
+Or via pip:
+
+```bash
+pip install uv
+```
+
+### 3. Install dependencies
+
+```bash
+uv sync
+```
+
+This creates a virtual environment and installs all dependencies from `pyproject.toml` (or `requirements.txt`). You can also use `uv pip install -r requirements.txt` if you prefer.
+
+### 4. Configure environment variables
 
 Copy the template and fill in your values:
 
@@ -64,7 +85,7 @@ Key variables (see `.env.template` for the full list and inline examples):
 
 > Never commit your `.env` file. It is already listed in `.gitignore`.
 
-### 4. Authenticate and configure gcloud
+### 5. Authenticate and configure gcloud
 
 ```bash
 gcloud auth login
@@ -73,16 +94,16 @@ gcloud config set project my-gcp-project-****
 gcloud auth application-default login
 ```
 
-### 5. Run the agent locally
+### 6. Run the agent locally
 
 ```bash
-adk run agentyx
+uv run adk run agentyx
 ```
 
 Or launch the ADK web UI:
 
 ```bash
-adk web
+uv run adk web
 ```
 
 ---
@@ -94,7 +115,7 @@ adk web
 Run the agent interactively in the terminal:
 
 ```bash
-adk run agentyx
+uv run adk run agentyx
 ```
 
 ### Web UI mode
@@ -102,7 +123,7 @@ adk run agentyx
 Launch the ADK developer UI in your browser — includes a chat interface, event trace, and state inspector:
 
 ```bash
-adk web
+uv run adk web
 ```
 
 Then open [http://localhost:8000](http://localhost:8000) and select **agentyx** from the agent dropdown.
@@ -112,7 +133,7 @@ Then open [http://localhost:8000](http://localhost:8000) and select **agentyx** 
 Expose the agent as a local REST endpoint (useful for integration testing):
 
 ```bash
-adk api_server agentyx
+uv run adk api_server agentyx
 ```
 
 The server starts at `http://localhost:8000`. You can interact with it via:
@@ -161,13 +182,13 @@ gcloud storage buckets create gs://my-agent-staging-**** --project=my-gcp-projec
 #### Option A — Create a new agent
 
 ```bash
-adk deploy agent_engine --project=my-gcp-project-**** --region=us-west1 --staging_bucket=gs://my-agent-staging-**** --display_name="My Agent Display Name" agentyx
+uv run adk deploy agent_engine --project=my-gcp-project-**** --region=us-west1 --staging_bucket=gs://my-agent-staging-**** --display_name="My Agent Display Name" agentyx
 ```
 
 #### Option B — Update an existing agent
 
 ```bash
-adk deploy agent_engine --agent_engine_id projects/12345678****/locations/us-west1/reasoningEngines/503236466477262**** --project=my-gcp-project-**** --region=us-west1 --staging_bucket=gs://my-agent-staging-**** --display_name="My Agent Display Name" agentyx
+uv run adk deploy agent_engine --agent_engine_id projects/12345678****/locations/us-west1/reasoningEngines/503236466477262**** --project=my-gcp-project-**** --region=us-west1 --staging_bucket=gs://my-agent-staging-**** --display_name="My Agent Display Name" agentyx
 ```
 
 > All values shown are examples with masked endings (`****`). Replace them with your actual project, bucket, region, and agent engine ID.
@@ -182,7 +203,8 @@ adk deploy agent_engine --agent_engine_id projects/12345678****/locations/us-wes
 │   ├── agent.py        # Agent definition and MCP toolset wiring
 │   └── prompts.py      # System instructions
 ├── main.py             # Entry point
-├── requirements.txt    # Python dependencies
+├── pyproject.toml      # Python dependencies (uv)
+├── requirements.txt    # Legacy pip dependencies
 ├── .env.template       # Environment variable template
 └── Deployment.txt      # Deployment command reference
 ```
