@@ -64,7 +64,16 @@ Key variables (see `.env.template` for the full list and inline examples):
 
 > Never commit your `.env` file. It is already listed in `.gitignore`.
 
-### 4. Run the agent locally
+### 4. Authenticate and configure gcloud
+
+```bash
+gcloud auth login
+gcloud components update
+gcloud config set project my-gcp-project-****
+gcloud auth application-default login
+```
+
+### 5. Run the agent locally
 
 ```bash
 adk run agentyx
