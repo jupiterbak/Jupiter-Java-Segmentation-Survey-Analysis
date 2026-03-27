@@ -81,7 +81,6 @@ Key variables (see `.env.template` for the full list and inline examples):
 | `INSIGHTS_URL` | Auto Insights MCP endpoint URL | `https://us1.alteryxcloud.com/auto-insights/mcp` |
 | `INSIGHTS_ACCESS_KEY` | Auto Insights access key | `aKPVEacZRw40****` |
 | `INSIGHTS_SECRET` | Auto Insights secret | `jrJFNNMElirU****` |
-| `AUTO_INSIGHTS_WORKSPACE_URL` | Deep link to Auto Insights workspace | `https://us1.alteryxcloud.com/auto-insights/missions/edit/****` |
 
 > Never commit your `.env` file. It is already listed in `.gitignore`.
 

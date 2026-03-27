@@ -3,7 +3,7 @@
 # ============================================================
 # This module returns the root instruction prompt for Juno,
 # the Jupiter Java customer segmentation agent.
-# Runtime values (current date, workspace URL) are injected
+# Runtime values (current date) are injected
 # at call time so the agent always has up-to-date context.
 # ============================================================
 
@@ -15,10 +15,6 @@ def return_instructions_root() -> str:
     # --- Inject runtime context into the prompt ---
     utc_now = datetime.now(timezone.utc)
     current_date = utc_now.strftime("%A, %d %B %Y %H:%M UTC")  # e.g. "Wednesday, 25 March 2026 14:32 UTC"
-
-    source_link = os.getenv("AUTO_INSIGHTS_WORKSPACE_URL", "")
-    source_label = os.getenv("AUTO_INSIGHTS_USECASE", "Jupiter Java Survey Analysis — Auto Insights")
-
     return f"""
 Your name is Juno. You are a customer segmentation and survey analysis agent for Jupiter Java,
 a coffee shop/café chain. You have access to 12 months of customer survey and transaction data
@@ -205,8 +201,7 @@ Structure your responses as:
 **Seasonal Context** — whether the current trend is above or below the seasonal baseline
 **Recommendations** — ranked by urgency and revenue impact, specific and actionable per cluster
 **Key Metrics Referenced** — the numbers that support your diagnosis
-**Source** — always include a source link at the end of each analysis response:
-  **Source: [{source_label}]({source_link})**
+**Source** — always include a source link at the end of each analysis response, which should be the URL of the analytics tool dashboard or report where the analysis was performed.
 
 ## Tone and Style
 - Write for a marketing director, café operations manager, or customer insights lead —

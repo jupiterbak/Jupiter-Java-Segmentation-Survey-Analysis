@@ -42,12 +42,6 @@ def get_root_agent() -> Agent:
     MODEL_NAME = os.getenv("MODEL_NAME", "gemini-2.5-flash")
     utc_now = datetime.now(timezone.utc)  # Used in the alternative inline instruction below
 
-    # Auto Insights deep-link injected into agent responses (used in the alternative instruction)
-    URL = os.getenv(
-        "AUTO_INSIGHTS_WORKSPACE_URL",
-        "https://us1.alteryxcloud.com/auto-insights/missions/edit/****",
-    )
-
     # Step 2 — Build the tool list dynamically from feature flags
     tools: list[ToolUnion] = []
 
