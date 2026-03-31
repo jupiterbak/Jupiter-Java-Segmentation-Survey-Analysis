@@ -14,7 +14,6 @@ dependencies = [
     "uvicorn",
     "google-generativeai",
     "httpx",
-    "litellm"
 ]
 
 [dependency-groups]
