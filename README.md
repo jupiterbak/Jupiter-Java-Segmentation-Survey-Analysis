@@ -73,7 +73,6 @@ Key variables (see `.env.template` for the full list and inline examples):
 | `GOOGLE_CLOUD_PROJECT` | GCP project ID | `my-gcp-project-****` |
 | `GOOGLE_CLOUD_LOCATION` | GCP region | `us-west1` |
 | `GOOGLE_CLOUD_STORAGE_BUCKET` | GCS bucket URI for staging | `gs://my-bucket-****` |
-| `GOOGLE_API_KEY` | Google API key for Gemini | `AIzaSyXXXXXX****` |
 | `AGENTYX_ENABLED` | Enable Agentyx MCP tool | `TRUE` / `FALSE` |
 | `AGENTYX_URL` | Agentyx MCP endpoint URL | `https://us1.alteryxcloud.com/agentyx/mcp/v1/` |
 | `AGENTYX_TOKEN` | Agentyx bearer token | `eyJ0b2tlbiI6...****` |
