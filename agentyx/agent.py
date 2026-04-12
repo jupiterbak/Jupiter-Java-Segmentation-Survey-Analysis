@@ -8,6 +8,10 @@
 import os
 from datetime import datetime, timezone
 
+from dotenv import load_dotenv
+
+load_dotenv()  # Load variables from .env into os.environ
+
 from google.adk.agents import Agent
 from google.adk.agents.llm_agent import ToolUnion
 from google.adk.planners import PlanReActPlanner
