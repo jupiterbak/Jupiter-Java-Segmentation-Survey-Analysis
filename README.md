@@ -73,13 +73,11 @@ Key variables (see `.env.template` for the full list and inline examples):
 | `GOOGLE_CLOUD_PROJECT` | GCP project ID | `my-gcp-project-****` |
 | `GOOGLE_CLOUD_LOCATION` | GCP region | `us-west1` |
 | `GOOGLE_CLOUD_STORAGE_BUCKET` | GCS bucket URI for staging | `gs://my-bucket-****` |
-| `AGENTYX_ENABLED` | Enable Agentyx MCP tool | `TRUE` / `FALSE` |
-| `AGENTYX_URL` | Agentyx MCP endpoint URL | `https://us1.alteryxcloud.com/agentyx/mcp/v1/` |
-| `AGENTYX_TOKEN` | Agentyx bearer token | `eyJ0b2tlbiI6...****` |
-| `INSIGHTS_ENABLED` | Enable Auto Insights MCP tool | `TRUE` / `FALSE` |
-| `INSIGHTS_URL` | Auto Insights MCP endpoint URL | `https://us1.alteryxcloud.com/auto-insights/mcp` |
-| `INSIGHTS_ACCESS_KEY` | Auto Insights access key | `aKPVEacZRw40****` |
-| `INSIGHTS_SECRET` | Auto Insights secret | `jrJFNNMElirU****` |
+| `ALTERYX_MCP_URL` | Alteryx MCP server endpoint | `https://us1.alteryxcloud.com/mcp/mcp/v1` |
+| `ALTERYX_MCP_TOKEN` | Alteryx MCP bearer token | `eyJ0b2tlbiI6...****` |
+| `ALTERYX_MCP_READ_ONLY` | Optional: expose only read-only tools (`&readOnly=true`) | `TRUE` / `FALSE` |
+| `AGENTYX_ENABLED` | Include the Agentyx (workflow) toolset | `TRUE` / `FALSE` |
+| `INSIGHTS_ENABLED` | Include the Auto Insights (analytics) toolset | `TRUE` / `FALSE` |
 
 > Never commit your `.env` file. It is already listed in `.gitignore`.
 

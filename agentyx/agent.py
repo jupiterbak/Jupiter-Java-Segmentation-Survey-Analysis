@@ -7,19 +7,24 @@
 
 import os
 from datetime import datetime, timezone
+from typing import Optional
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from dotenv import load_dotenv
 
 load_dotenv()  # Load variables from .env into os.environ
 
 from google.adk.agents import Agent
+from google.adk.agents.callback_context import CallbackContext
 from google.adk.agents.llm_agent import ToolUnion
+from google.adk.models.llm_response import LlmResponse
 from google.adk.planners import PlanReActPlanner
 from google.adk.tools.mcp_tool.mcp_toolset import (
     McpToolset,
     StreamableHTTPConnectionParams,
     StdioConnectionParams,       # Used by commented optional toolsets below
 )
+from google.genai import types as genai_types
 from mcp import StdioServerParameters  # Used by commented optional toolsets below
 
 from .prompts import return_instructions_root
@@ -40,6 +45,45 @@ def get_required_env_var(var_name: str) -> str:
     return value
 
 
+# --- Helper: append MCP query params (toolsets, readOnly) to the base URL ---
+def build_mcp_url(base_url: str, toolsets: list[str], read_only: bool) -> str:
+    """Appends ?toolsets=...&readOnly=true to the MCP server URL, per Alteryx MCP conventions."""
+    parsed = urlparse(base_url)
+    query = dict(parse_qsl(parsed.query))
+    if toolsets:
+        query["toolsets"] = ",".join(toolsets)
+    if read_only:
+        query["readOnly"] = "true"
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
+# --- Callback: surface a message when the model's turn ends with no content ---
+# Gemini occasionally emits a malformed function call (or is cut off) while
+# chaining several tool calls in one turn. When that happens, ADK builds an
+# LlmResponse with error_code set and no content/parts, and the agent loop
+# ends the turn silently — the user sees the tools run and then nothing.
+# This callback swaps that empty response for a visible, actionable message.
+# def _recover_from_empty_model_response(
+#     callback_context: CallbackContext, llm_response: LlmResponse
+# ) -> Optional[LlmResponse]:
+#     if llm_response.content and llm_response.content.parts:
+#         return None  # Response already has visible content — leave it alone.
+#     if not llm_response.error_code:
+#         return None  # No content but no error either — nothing to recover from.
+
+#     return LlmResponse(
+#         content=genai_types.Content(
+#             role="model",
+#             parts=[genai_types.Part(text=(
+#                 "I hit an internal snag chaining tool calls for that request "
+#                 f"(`{llm_response.error_code}`) and couldn't finish the analysis. "
+#                 "Could you narrow the question — e.g. one cluster, one measure, "
+#                 "or one time period at a time — and I'll try again?"
+#             ))],
+#         ),
+#     )
+
+
 # --- Agent factory ---
 def get_root_agent() -> Agent:
     # Step 1 — Resolve model and shared runtime context
@@ -49,31 +93,23 @@ def get_root_agent() -> Agent:
     # Step 2 — Build the tool list dynamically from feature flags
     tools: list[ToolUnion] = []
 
-    # Step 2a — Alteryx Agentyx (workflow MCP tool)
+    # Step 2a — Alteryx MCP server (single endpoint, toolsets selected via query params:
+    # ?toolsets=agentyx,insights and, optionally, &readOnly=true)
+    toolsets: list[str] = []
     if get_bool_env_var("AGENTYX_ENABLED", False):
-        agentyx_url = get_required_env_var("AGENTYX_URL")
-        agentyx_token = get_required_env_var("AGENTYX_TOKEN")
-
-        tools.append(McpToolset(
-            connection_params=StreamableHTTPConnectionParams(
-                url=agentyx_url,
-                headers={"Authorization": f"Bearer {agentyx_token}"},
-            ),
-        ))
-
-    # Step 2b — Alteryx Auto Insights (analytics MCP tool)
+        toolsets.append("agentyx")
     if get_bool_env_var("INSIGHTS_ENABLED", False):
-        insights_url = get_required_env_var("INSIGHTS_URL")
-        insights_access_key = get_required_env_var("INSIGHTS_ACCESS_KEY")
-        insights_secret = get_required_env_var("INSIGHTS_SECRET")
+        toolsets.append("insights")
+
+    if toolsets:
+        alteryx_mcp_url = get_required_env_var("ALTERYX_MCP_URL")
+        alteryx_mcp_token = get_required_env_var("ALTERYX_MCP_TOKEN")
+        read_only = get_bool_env_var("ALTERYX_MCP_READ_ONLY", False)
 
         tools.append(McpToolset(
             connection_params=StreamableHTTPConnectionParams(
-                url=insights_url,
-                headers={
-                    "x-access-key": insights_access_key,
-                    "x-secret": insights_secret,
-                },
+                url=build_mcp_url(alteryx_mcp_url, toolsets, read_only),
+                headers={"Authorization": f"Bearer {alteryx_mcp_token}"},
             ),
         ))
 
@@ -109,7 +145,8 @@ def get_root_agent() -> Agent:
         description="Marveryx the Alteryx Agent that can answer user questions using Auto-Insights.",
         instruction=return_instructions_root(),  # Loads system prompt from prompts.py
         tools=tools,
-        planner=PlanReActPlanner(),              # Uses Plan-then-ReAct reasoning strategy
+        # planner=PlanReActPlanner(),              # Uses Plan-then-ReAct reasoning strategy
+        # after_model_callback=_recover_from_empty_model_response,
     )
 
 
